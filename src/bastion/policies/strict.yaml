@@ -1,0 +1,53 @@
+# bastion strict policy: deny by default.
+#
+# Only tools explicitly granted below may be called; everything else is
+# denied. Use this for high-assurance deployments where the tool surface is
+# known and fixed.
+name: strict
+version: 1
+budget_ms: 500
+per_rule_timeout_ms: 100
+on_budget_exceeded: fail_closed
+default_decision: deny
+
+capabilities:
+  - tool: "read_*"
+    decision: allow
+    note: "read-only tools only"
+  - tool: "get_*"
+    decision: allow
+  - tool: "list_*"
+    decision: allow
+  - tool: "search*"
+    decision: require_approval
+  - tool: "*write*"
+    decision: require_approval
+  - tool: "*delete*"
+    decision: deny
+  - tool: "*exec*"
+    decision: deny
+
+rules:
+  - id: tool_poisoning
+  - id: hidden_instructions
+  - id: rug_pull
+    config:
+      pin_on_first_seen: true
+  - id: shadowing
+  - id: capability_grant
+  - id: arg_schema
+  - id: arg_exfiltration
+    config:
+      detectors: [secrets, sensitive_paths, pii]
+      max_arg_bytes: 16384
+  - id: result_injection
+  - id: resource_guard
+  - id: rate_limit
+    config:
+      per_tool_per_min: 20
+      per_session: 200
+
+audit:
+  sink: sqlite
+  record_arguments: hashed
+  retention_days: 180

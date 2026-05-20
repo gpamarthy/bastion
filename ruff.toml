@@ -1,0 +1,47 @@
+line-length = 100
+target-version = "py310"
+extend-exclude = [".venv", "build", "dist"]
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff
+    "PL",   # pylint
+    "PT",   # flake8-pytest-style
+    "RET",  # flake8-return
+    "ARG",  # flake8-unused-arguments
+    "TID",  # flake8-tidy-imports
+    "C4",   # flake8-comprehensions
+    "T20",  # flake8-print (forbid print in src)
+    "ANN",  # flake8-annotations
+]
+ignore = [
+    "E501",     # line length handled by formatter
+    "PLR0913",  # too many arguments
+    "PLR2004",  # magic value comparisons
+    "ANN401",   # JSON-RPC params/results/errors are inherently `Any`
+]
+
+[lint.per-file-ignores]
+"tests/**" = ["ANN", "PLR2004", "ARG", "S101", "T20", "PT018"]
+# Rule hooks conform to a fixed interface; unused hook args are expected.
+"src/bastion/rules/checks/**" = ["ARG002"]
+"src/bastion/rules/base.py" = ["ARG002"]
+"src/bastion/__main__.py" = ["T20"]
+"src/bastion/cli.py" = ["T20", "PLC0415"]  # lazy imports keep CLI startup fast
+"examples/**" = ["T20", "ANN"]
+"scripts/**" = ["T20"]
+
+[lint.isort]
+known-first-party = ["bastion"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"

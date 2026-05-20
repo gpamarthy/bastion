@@ -1,0 +1,62 @@
+# bastion default policy.
+#
+# Definition-level rules (tool poisoning, hidden instructions, rug pull) block
+# outright. Tool calls are gated by the capability table; unmatched tools fall
+# back to require_approval. Until the approval broker ships (M4), an approval
+# decision is logged and allowed through, so this policy is safe to run as-is.
+name: default
+version: 1
+budget_ms: 500
+per_rule_timeout_ms: 100
+on_budget_exceeded: fail_closed
+default_decision: require_approval
+
+capabilities:
+  - tool: "read_*"
+    decision: allow
+    note: "read-only file/data tools"
+  - tool: "get_*"
+    decision: allow
+  - tool: "list_*"
+    decision: allow
+  - tool: "search*"
+    decision: allow
+  - tool: "*write*"
+    decision: require_approval
+    note: "mutating tools need a human in the loop"
+  - tool: "*delete*"
+    decision: require_approval
+  - tool: "run_*"
+    decision: require_approval
+  - tool: "*exec*"
+    decision: deny
+    note: "command execution is denied by default"
+  - tool: "execute_command"
+    decision: deny
+  - tool: "shell*"
+    decision: deny
+
+rules:
+  - id: tool_poisoning
+  - id: hidden_instructions
+  - id: rug_pull
+    config:
+      pin_on_first_seen: true
+  - id: shadowing
+  - id: capability_grant
+  - id: arg_schema
+  - id: arg_exfiltration
+    config:
+      detectors: [secrets, sensitive_paths]
+      max_arg_bytes: 65536
+  - id: result_injection
+  - id: resource_guard
+  - id: rate_limit
+    config:
+      per_tool_per_min: 60
+      per_session: 1000
+
+audit:
+  sink: sqlite
+  record_arguments: redacted
+  retention_days: 90

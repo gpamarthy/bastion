@@ -1,0 +1,27 @@
+# bastion minimal policy: detection only.
+#
+# Definition-level threats (tool poisoning, hidden instructions, rug pull) are
+# still blocked - those are never things you want to allow - but no capability
+# gating is applied to tool calls. Use this to observe a deployment before
+# tightening to the default or strict policy.
+name: minimal
+version: 1
+budget_ms: 500
+per_rule_timeout_ms: 100
+on_budget_exceeded: fail_open
+default_decision: allow
+
+capabilities: []
+
+rules:
+  - id: tool_poisoning
+  - id: hidden_instructions
+  - id: rug_pull
+    config:
+      pin_on_first_seen: true
+  - id: result_injection
+
+audit:
+  sink: jsonl
+  record_arguments: redacted
+  retention_days: 30

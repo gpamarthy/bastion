@@ -1,0 +1,9 @@
+attack: none
+taxonomy: null
+kind: call
+expect: allow
+description: An ordinary tool call with no secrets or sensitive paths.
+call:
+  name: read_file
+  arguments:
+    path: /workspace/docs/README.md
