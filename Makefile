@@ -32,12 +32,12 @@ $(VENV)/.installed: pyproject.toml
 	touch $(VENV)/.installed
 
 lint: install
-	$(RUFF) check src tests examples
-	$(RUFF) format --check src tests examples
+	$(RUFF) check src tests examples scripts
+	$(RUFF) format --check src tests examples scripts
 
 format: install
-	$(RUFF) check --fix src tests examples
-	$(RUFF) format src tests examples
+	$(RUFF) check --fix src tests examples scripts
+	$(RUFF) format src tests examples scripts
 
 typecheck: install
 	$(MYPY) src
